@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+﻿using System.Text.Json;
 
 namespace NeuralNetwork
 {
@@ -157,7 +157,10 @@ namespace NeuralNetwork
 
         public void FromJson(string json)
         {
-            var data = JsonConvert.DeserializeObject<NeuralNetworkData>(json) ?? throw new ArgumentException("Invalid JSON data", nameof(json));
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new TwoDimensionalDoubleArrayJsonConverter());
+
+            var data = JsonSerializer.Deserialize<NeuralNetworkData>(json, options)  ?? throw new ArgumentException("Invalid JSON data", nameof(json));
 
             InputNodes = data.InputNodes;
             HiddenNodes = data.HiddenNodes;
@@ -185,7 +188,11 @@ namespace NeuralNetwork
                 WeightInputToHidden = _weightInputToHidden,
                 WeightHiddenToOutput = _weightHiddenToOutput
             };
-            return JsonConvert.SerializeObject(data);
+
+            var options = new JsonSerializerOptions();
+            options.Converters.Add(new TwoDimensionalDoubleArrayJsonConverter());
+
+            return JsonSerializer.Serialize(data, options);
         }
     }
 }

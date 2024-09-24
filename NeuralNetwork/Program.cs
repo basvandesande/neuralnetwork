@@ -11,14 +11,14 @@ namespace NeuralNetwork
             var stopWatch = new Stopwatch();
             var cls = new NeuralNetwork(784, 100, 10, 0.25);
             
-            var emptyStateFilePath = @$"C:\Development\NeuralNetwork\NetworkState\learning rate 0_1\neural_state_100.json";
+            var emptyStateFilePath = @$"C:\Development\NeuralNetwork\NetworkState\learning rate 0_25\neural_state_60000.json";
 
             //File.WriteAllText(emptyStateFilePath, cls.ToJson());
             string json = File.ReadAllText(emptyStateFilePath);
             cls.FromJson(json);
             
-            string setSize = "60000";
-            int maxEpochs = 20;
+            string setSize = "5000";
+            int maxEpochs = 10;
             int bestScore = 0;
             int epochs = 0;
             stopWatch.Start();
@@ -26,10 +26,10 @@ namespace NeuralNetwork
             for (epochs = 0; epochs < maxEpochs; epochs++)
             {
                 Console.WriteLine($"- Training network (set {setSize}) - epoch {epochs + 1}...");
-                TrainFromFile(cls, @$"C:\Development\NeuralNetwork\mnist sets\mnist_train_{setSize}.csv");
+                TrainFromFile(cls, @$"C:\Development\NeuralNetwork\mnist_sets\mnist_train_{setSize}.csv");
 
                 Console.WriteLine("  Testing network (set 10000)...");
-                int score = TestFromFile(cls, @"C:\Development\NeuralNetwork\mnist sets\mnist_test.csv", false);
+                int score = TestFromFile(cls, @"C:\Development\NeuralNetwork\mnist_sets\mnist_test.csv", false);
                 // bail out, in case we don't improve anymore
                 if (score <= bestScore)
                 {
