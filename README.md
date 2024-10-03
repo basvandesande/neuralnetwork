@@ -53,7 +53,7 @@ Where ( e ) is the base of the natural logarithm, and ( x ) is the input to the 
 ## Test data
 Test data can be found as a zip file in the folder TrainingData. What I did for the experimentation is chopping up the testing data in multiple chunks
 
-![alt text](Images\image.png)
+![alt text](Images/image.png)
 
 The program in the `PrepareDataSets` folder is a utility to preprocess the raw data, making it suitable for training and testing the neural network. It handles tasks such as splitting the data into manageable chunks, normalizing the input features, and saving the processed data for further use.
 
