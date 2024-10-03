@@ -408,7 +408,7 @@ FodyWeavers.xsd
 /experimental
 /MatrixCalculator
 /NetworkState
-/PrepareDataSets
+
 
 # msbuild output directories
 /NeuralNetwork/bin
