@@ -4,7 +4,7 @@ Neural Network built from scratch in C#
 
 ## Introduction
 This Neural Network is the result of one of my learnings. I was intrigued by the parcel detection capabilities of my Google Nest doorbell (2nd gen). I wanted to know how it was possible for such a low powered device to do the parcel detection, even when running offline. 
-
+For my learning purposes I wrote a network that is capable of recognizing handwritten numbers, as there is a good set of test data available from NIST.
 
 ## Main Classes / functionalities. 
 The main functionalities include training the neural network with data from files and testing the neural network's performance with test data. Here are the key components:
