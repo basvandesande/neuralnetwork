@@ -11,13 +11,16 @@ namespace NeuralNetwork
             var stopWatch = new Stopwatch();
             var cls = new NeuralNetwork(784, 100, 10, 0.25);
             
-            var emptyStateFilePath = @$"C:\Development\NeuralNetwork\NetworkState\learning rate 0_25\neural_state_60000.json";
+            var stateFilePath = @$"C:\Development\NeuralNetwork\NetworkState\learning rate 0_25\neural_state_1000.json";
 
-            //File.WriteAllText(emptyStateFilePath, cls.ToJson());
-            string json = File.ReadAllText(emptyStateFilePath);
+            // uncomment the following line to create an empty state file
+            //File.WriteAllText(StateFilePath, cls.ToJson());
+
+            // Load the state of the neural network
+            string json = File.ReadAllText(stateFilePath);
             cls.FromJson(json);
             
-            string setSize = "5000";
+            string setSize = "1000";
             int maxEpochs = 10;
             int bestScore = 0;
             int epochs = 0;
@@ -25,11 +28,16 @@ namespace NeuralNetwork
             
             for (epochs = 0; epochs < maxEpochs; epochs++)
             {
-                Console.WriteLine($"- Training network (set {setSize}) - epoch {epochs + 1}...");
-                TrainFromFile(cls, @$"C:\Development\NeuralNetwork\mnist_sets\mnist_train_{setSize}.csv");
+                NeuralNetwork trainCls = cls;
 
-                Console.WriteLine("  Testing network (set 10000)...");
-                int score = TestFromFile(cls, @"C:\Development\NeuralNetwork\mnist_sets\mnist_test.csv", false);
+                Console.WriteLine($"- Training network (set {setSize}) - epoch {epochs + 1}...");
+                TrainFromFile(trainCls, @$"C:\Development\NeuralNetwork\mnist_sets\mnist_train_{setSize}.csv");
+
+                Console.WriteLine($"  Testing network (10000 testcases...");
+                
+                // Test the network with the test set, show the results per line if you want (true)
+                int score = TestFromFile(trainCls, @"C:\Development\NeuralNetwork\mnist_sets\mnist_test.csv", false);
+                
                 // bail out, in case we don't improve anymore
                 if (score <= bestScore)
                 {
@@ -37,11 +45,14 @@ namespace NeuralNetwork
                     break;
                 }
                 bestScore = score;
+
+                // we dont want to lose the best network
+                cls = trainCls;
             }
 
 
             // Save the state of the neural network
-            var stateFilePath = @$"C:\development\neuralnetwork\networkstate\neural_state_{setSize}.json";
+            stateFilePath = @$"C:\development\neuralnetwork\networkstate\neural_state_{setSize}.json";
             File.WriteAllText(stateFilePath, cls.ToJson());
 
             stopWatch.Stop();
@@ -107,8 +118,5 @@ namespace NeuralNetwork
 
             return score;
         }
-
-
-
     }
 }
