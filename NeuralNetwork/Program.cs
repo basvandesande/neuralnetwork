@@ -9,7 +9,7 @@ namespace NeuralNetwork
             Console.WriteLine("Neural network - object recognition");
 
             var stopWatch = new Stopwatch();
-            var cls = new NeuralNetwork(784, 100, 10, 0.25);
+            var cls = new NeuralNetwork(784, 50, 50, 10, 0.05);
             
             var stateFilePath = @$"C:\Development\NeuralNetwork\NetworkState\learning rate 0_25\neural_state_1000.json";
 
