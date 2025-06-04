@@ -6,25 +6,29 @@ namespace NeuralNetwork
     {
         private int InputNodes { get; set; } = 3;
         private int HiddenNodes { get; set; } = 3;
+        private int HiddenNodes2 { get; set; } = 3; // New hidden layer
         private int OutputNodes { get; set; } = 3;
         private double LearningRate { get; set; } = 0.5;
-        
+
         private Matrix _weightInputToHidden;
-        private Matrix _weightHiddenToOutput;
+        private Matrix _weightHiddenToHidden2; // New weights
+        private Matrix _weightHidden2ToOutput;
 
         private int _totalTrainingRecords = 0;
         private int _totalTestRecords = 0;
         private int _correct = 0;
 
-        public NeuralNetwork(int inputNodes, int hiddenNodes, int outputNodes, double learningRate)
+        public NeuralNetwork(int inputNodes, int hiddenNodes, int hiddenNodes2, int outputNodes, double learningRate)
         {
             InputNodes = inputNodes;    
             HiddenNodes = hiddenNodes;
+            HiddenNodes2 = hiddenNodes2;
             OutputNodes = outputNodes;
             LearningRate = learningRate;
 
             _weightInputToHidden = InitializeBiasedMatrix(HiddenNodes, InputNodes);
-            _weightHiddenToOutput = InitializeBiasedMatrix(OutputNodes, HiddenNodes);
+            _weightHiddenToHidden2 = InitializeBiasedMatrix(HiddenNodes2, HiddenNodes);
+            _weightHidden2ToOutput = InitializeBiasedMatrix(OutputNodes, HiddenNodes2);
         }
         
         private Matrix InitializeBiasedMatrix(int rows, int cols)
@@ -50,18 +54,20 @@ namespace NeuralNetwork
         
         public double[] Query(double[] input_list)
         {
-            // feed the neural network with the input data (convert 1d array to 2d matrix and transpose)
             Matrix inputs = new Matrix(input_list).Transpose();
 
-            // process the input and pass it through the hidden layer, sigmoid (activation function) will fire if needed
+            // First hidden layer
             Matrix hidden_inputs = _weightInputToHidden * inputs;
             Matrix hidden_outputs = hidden_inputs.ApplyActivator(Sigmoid);
 
-            // process the output of the hidden layer and pass it through the the output layer, sigmoid (activation function) will fire if needed
-            Matrix final_inputs = _weightHiddenToOutput * hidden_outputs;
+            // Second hidden layer
+            Matrix hidden2_inputs = _weightHiddenToHidden2 * hidden_outputs;
+            Matrix hidden2_outputs = hidden2_inputs.ApplyActivator(Sigmoid);
+
+            // Output layer
+            Matrix final_inputs = _weightHidden2ToOutput * hidden2_outputs;
             Matrix final_outputs = final_inputs.ApplyActivator(Sigmoid);
-            
-            // flatten the outputs to a 1D array and return it
+
             return final_outputs.Cast<double>().ToArray(); 
         }
 
@@ -83,27 +89,32 @@ namespace NeuralNetwork
 
         public void Train(double[] input_list, double[] targets_list)
         {
-            // train the network with the input data
             Matrix inputs = new Matrix(input_list).Transpose();
 
+            // First hidden layer
             Matrix hidden_inputs = _weightInputToHidden * inputs;
             Matrix hidden_outputs = hidden_inputs.ApplyActivator(Sigmoid);
 
-            Matrix final_inputs = _weightHiddenToOutput * hidden_outputs;
+            // Second hidden layer
+            Matrix hidden2_inputs = _weightHiddenToHidden2 * hidden_outputs;
+            Matrix hidden2_outputs = hidden2_inputs.ApplyActivator(Sigmoid);
+
+            // Output layer
+            Matrix final_inputs = _weightHidden2ToOutput * hidden2_outputs;
             Matrix final_outputs = final_inputs.ApplyActivator(Sigmoid);
 
-            // the output layer error is the (target - actual outcome (final_outputs))
-            // update the weights for the links between the hidden and the output layers
             Matrix targets = new Matrix(targets_list).Transpose();
             Matrix output_errors = targets - final_outputs;
-            UpdateWeights(ref _weightHiddenToOutput, output_errors, final_outputs, hidden_outputs);
+            UpdateWeights(ref _weightHidden2ToOutput, output_errors, final_outputs, hidden2_outputs);
 
-            // hidden layer error is the output_errors, split by weights, recombined at the hidden_nodes
-            // update the weights for the links between the input and the hidden layers
-            Matrix hidden_errors = _weightHiddenToOutput.Transpose() * output_errors;
-            UpdateWeights(ref _weightInputToHidden,  hidden_errors, hidden_outputs, inputs);
+            // Error for second hidden layer
+            Matrix hidden2_errors = _weightHidden2ToOutput.Transpose() * output_errors;
+            UpdateWeights(ref _weightHiddenToHidden2, hidden2_errors, hidden2_outputs, hidden_outputs);
 
-            // set statistics for the training
+            // Error for first hidden layer
+            Matrix hidden_errors = _weightHiddenToHidden2.Transpose() * hidden2_errors;
+            UpdateWeights(ref _weightInputToHidden, hidden_errors, hidden_outputs, inputs);
+
             _totalTrainingRecords++;
         }
 
@@ -168,7 +179,7 @@ namespace NeuralNetwork
             LearningRate = data.LearningRate;
 
             _weightInputToHidden = data.WeightInputToHidden;
-            _weightHiddenToOutput = data.WeightHiddenToOutput;
+            _weightHidden2ToOutput = data.WeightHiddenToOutput;
         }
 
         public string ToJson()
@@ -186,7 +197,7 @@ namespace NeuralNetwork
                     Correct = _correct
                 },
                 WeightInputToHidden = _weightInputToHidden,
-                WeightHiddenToOutput = _weightHiddenToOutput
+                WeightHiddenToOutput = _weightHidden2ToOutput
             };
 
             var options = new JsonSerializerOptions();

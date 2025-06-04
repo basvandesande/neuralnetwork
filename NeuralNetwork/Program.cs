@@ -9,7 +9,7 @@ namespace NeuralNetwork
             Console.WriteLine("Neural network - object recognition");
 
             var stopWatch = new Stopwatch();
-            var cls = new NeuralNetwork(784, 100, 10, 0.25);
+            var cls = new NeuralNetwork(784, 50, 50, 10, 0.05);
             
             var stateFilePath = @$"C:\Development\NeuralNetwork\NetworkState\learning rate 0_25\neural_state_1000.json";
 
@@ -20,8 +20,8 @@ namespace NeuralNetwork
             string json = File.ReadAllText(stateFilePath);
             cls.FromJson(json);
             
-            string setSize = "1000";
-            int maxEpochs = 10;
+            string setSize = "5000";
+            int maxEpochs = 15;
             int bestScore = 0;
             int epochs = 0;
             stopWatch.Start();
@@ -33,7 +33,7 @@ namespace NeuralNetwork
                 Console.WriteLine($"- Training network (set {setSize}) - epoch {epochs + 1}...");
                 TrainFromFile(trainCls, @$"C:\Development\NeuralNetwork\mnist_sets\mnist_train_{setSize}.csv");
 
-                Console.WriteLine($"  Testing network (10000 testcases...");
+                Console.WriteLine($"  Testing network (10000 testcases...)");
                 
                 // Test the network with the test set, show the results per line if you want (true)
                 int score = TestFromFile(trainCls, @"C:\Development\NeuralNetwork\mnist_sets\mnist_test.csv", false);
